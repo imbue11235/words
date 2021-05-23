@@ -1,1 +1,1 @@
-# words [![Test Status](https://github.com/imbue11235/words/workflows/Go/badge.svg)](https://github.com/imbue11235/words/actions?query=workflow%3A%Go%22)
+# words [![Test Status](https://github.com/imbue11235/words/workflows/Go/badge.svg)](https://github.com/imbue11235/words/actions?query=workflow%3A%Go%22) [![codecov](https://codecov.io/gh/imbue11235/words/branch/main/graph/badge.svg?token=XTJ42655U1)](https://codecov.io/gh/imbue11235/words)
