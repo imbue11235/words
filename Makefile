@@ -1,0 +1,6 @@
+build:
+	go build ./...
+
+test:
+	go mod tidy -v
+	go test ./...
