@@ -1,1 +1,1 @@
-# Words [![Test Status](https://github.com/imbue11235/words/workflows/test/badge.svg)](https://github.com/imbue11235/words/actions?query=workflow%3A%test%22)
+# words [![Test Status](https://github.com/imbue11235/words/workflows/Go/badge.svg)](https://github.com/imbue11235/words/actions?query=workflow%3A%Go%22)
