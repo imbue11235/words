@@ -11,7 +11,9 @@ func TestExtract(t *testing.T) {
 		input string
 		expected []string
 	} {
-		{ "Windows2000", []string{"Windows", "2000"} },
+		{"Win2000", []string{"Win", "2000"} },
+		{"YAMLParser", []string{"YAML", "Parser"}},
+		{"SOME_CONSTANT_STRING_REPRESENTATION", []string{"SOME", "CONSTANT", "STRING", "REPRESENTATION"}},
 	}
 
 	for _, test := range tests {
