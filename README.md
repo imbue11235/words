@@ -5,7 +5,7 @@ Go package `words` provides capabilities for extracting words from a string, by 
 
 1. Invalid UTF8-strings will not be split
 2. Hyphenated words will be treated as individual words unless disabled. E.g. `"small-town" => []{"small", "town"}`
-3. If the character is a space, punctuation or symbol, it will be voided, unless disabled. E.g. "my_string  here" => []{"my", "string", "here"}`
+3. If the character is a space, punctuation or symbol, it will be voided, unless disabled. E.g. `"my_string  here" => []{"my", "string", "here"}`
 4. Characters of same type in sequence, will be put together.
 5. If the current character is a lowercase, and the last character of the previous word was uppercase, the uppercase letter will be moved to the lowercase string. E.g. `"YAMLParser" => []{"YAML", "Parser"}`
 
