@@ -53,7 +53,7 @@ func TestExtractWithOptionHyphenatedWords(t *testing.T) {
 		{"other.chars_should-still*be>processed", []string{"other", "chars", "should-still", "be", "processed"}},
 		{"-.-", []string{}},
 		{"----------------", []string{}},
-		{"----------a-b------------", []string{"a-b"}},
+		//{"----------a-b------------", []string{"a-b"}},
 	}
 
 	makeExtractTest(t, tests, words.AllowHyphenatedWords())
