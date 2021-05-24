@@ -1,3 +1,14 @@
+// Package words provides capabilities for splitting
+// a string into a slice of words by a collection of rules
+//
+// Rules:
+// 1. Invalid UTF8-strings will not be split
+// 2. Hyphenated words will be treated as individual words unless disabled. E.g. "small-town" => []{"small", "town"}
+// 3. If the character is a space, punctuation or symbol, it will be voided,
+// unless disabled. E.g. "my_string  here" => []{"my", "string", "here"}
+// 4. Characters of same type in sequence, will be put together.
+// 5. If the current character is a lowercase, and the last character of the previous word was uppercase,
+// the uppercase letter will be moved to the lowercase string. E.g. "YAMLParser" => []{"YAML", "Parser"}
 package words
 
 import (
@@ -17,7 +28,9 @@ const (
 
 const hyphen = rune(45)
 
-func getRuneType(r rune) int {
+// getRuneKind takes the rune and returns
+// the int representation of it's kind
+func getRuneKind(r rune) int {
 	switch {
 	case unicode.IsSymbol(r):
 		return symbol
@@ -36,8 +49,10 @@ func getRuneType(r rune) int {
 	return unknown
 }
 
-func shouldInclude(runeType int, config *config) bool {
-	switch runeType {
+// shouldInclude checks if the kind of rune should be included
+// in the word
+func shouldInclude(runeKind int, config *config) bool {
+	switch runeKind {
 	case symbol:
 		return config.includeSymbols
 	case punctuation:
@@ -49,51 +64,78 @@ func shouldInclude(runeType int, config *config) bool {
 	return true
 }
 
-// Rules:
-// 1. Invalid UTF8-strings will not be split
+func in(runeKind int, runeKinds []int) bool {
+	for _, kind := range runeKinds {
+		if runeKind == kind {
+			return true
+		}
+	}
 
+	return false
+}
+
+// extract with by the defined rules
 func extract(input string, config *config) []string {
+	// Early return, if invalid string (Rule 1)
 	if !utf8.ValidString(input) {
 		return []string{input}
 	}
 
 	var runes [][]rune
-	var runeType int
-	lastRuneType := 0
-	indexes := -1
+	runeKind, lastRuneKind, runesLen := 0, 0, -1
 
 	for _, r := range input {
-		runeType = getRuneType(r)
-
-		if config.allowHyphenatedWords && r == hyphen {
-			runes[len(runes) - 1] = append(runes[len(runes) - 1], r)
+		// If hyphenated words are allowed and current character is hyphenated,
+		// it'll get appended to the current rune slice,
+		// if the previous rune was a letter (upper/lowercase)
+		// without keeping track of it's rune type (Rule 2).
+		// However, if the hyphen is the first character of a word, it will be skipped.
+		if config.allowHyphenatedWords &&
+			r == hyphen &&
+			in(lastRuneKind, []int{lowercase, uppercase}) &&
+			runesLen >= 0 &&
+			len(runes[runesLen]) != 0 {
+			runes[runesLen] = append(runes[runesLen], r)
 			continue
 		}
 
-		if !shouldInclude(runeType, config) {
-			lastRuneType = runeType
+		// Define the rune kind
+		runeKind = getRuneKind(r)
+
+		// Determine if the current rune should be voided or not.
+		// The current rune kind will still be set, to make sure that a new word
+		// will be started on in next iteration (Rule 3).
+		if !shouldInclude(runeKind, config) {
+			lastRuneKind = runeKind
 			continue
 		}
 
-		if runeType == lastRuneType {
-			runes[len(runes) - 1] = append(runes[len(runes) - 1], r)
-			lastRuneType = runeType
+		// If the rune has same kind as last rune, it will get appended
+		// to the current word. (Rule 4)
+		if runeKind == lastRuneKind {
+			runes[runesLen] = append(runes[runesLen], r)
 			continue
 		}
 
+		// Start a new word
 		runes = append(runes, []rune{r})
-		indexes++
 
-		if lastRuneType == uppercase && runeType == lowercase {
+		// Keep track of the runes index, instead of using len(runes) to find current index
+		runesLen++
+
+		// Move a uppercase rune from the end of previous word, to this word (Rule 5).
+		if lastRuneKind == uppercase && runeKind == lowercase {
 			// Prepend the last character of previous rune-slice
-			runes[indexes] = append([]rune{runes[indexes-1][len(runes[indexes-1])-1]}, runes[indexes]...)
+			runes[runesLen] = append([]rune{runes[runesLen-1][len(runes[runesLen-1])-1]}, runes[runesLen]...)
 			// Remove the last character from the previous rune-slice
-			runes[indexes-1] = runes[indexes-1][:len(runes[indexes-1])-1]
+			runes[runesLen-1] = runes[runesLen-1][:len(runes[runesLen-1])-1]
 		}
 
-		lastRuneType = runeType
+		lastRuneKind = runeKind
+
 	}
 
+	// Convert the rune slices to strings
 	var output []string
 	for _, r := range runes {
 		if len(r) == 0 {
@@ -106,6 +148,7 @@ func extract(input string, config *config) []string {
 	return output
 }
 
+// Extract extracts words from a given string with potential options.
 func Extract(input string, options ...Option) []string {
 	config := newDefaultConfig()
 	config.apply(options...)

@@ -12,4 +12,4 @@ cover:
 	go tool cover -html=cover.out -o cover.html
 
 test:
-	go test ./... -v -cover
+	go test ./... -v
