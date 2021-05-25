@@ -64,6 +64,7 @@ func shouldInclude(runeKind int, config *config) bool {
 	return true
 }
 
+// in checks if the rune kind is in the given slice of rune kinds
 func in(runeKind int, runeKinds []int) bool {
 	for _, kind := range runeKinds {
 		if runeKind == kind {
@@ -74,6 +75,8 @@ func in(runeKind int, runeKinds []int) bool {
 	return false
 }
 
+// isHyphenatedWord determines if the word is a hyphenated word
+// by looking at adjacent rune kinds
 func isHyphenatedWord(r rune, lastRuneKind, nextRuneKind int) bool {
 	if r != hyphen {
 		return false
