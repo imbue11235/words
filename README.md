@@ -48,7 +48,7 @@ words.Extract("So, now punctuation will be included.", words.IncludePunctuation(
 To include spaces
 
 ```go
-words.Extract("So   many    spaces", words.IncludeSpaces())
+words.Extract("So   many   spaces", words.IncludeSpaces())
 // => []string{"So", "   ", "many", "   ", "spaces"}
 ```
 
@@ -68,4 +68,13 @@ To allow hyphenated words
 ```go
 words.Extract("An anti-clockwise direction", words.AllowHyphenatedWords())
 // => []string{"An", "anti-clockwise", "direction"}
+```
+
+#### Multiple options
+
+To use multiple options at the same time
+
+```go
+words.Extract("Using multiple options!" words.IncludeSpaces(), words.IncludePunctuation())
+// => []string{"Using", " ", "multiple", " ", "options", "!"}
 ```

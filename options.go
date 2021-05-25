@@ -14,11 +14,6 @@ func IncludeSymbols() includeSymbols {
 	return includeSymbols(true)
 }
 
-// IgnoreSymbols ignores symbols in the extraction. E.g. "beer>food" => []{"beer", "food"}
-func IgnoreSymbols() includeSymbols {
-	return includeSymbols(false)
-}
-
 func (i includeSymbols) apply(c *config) {
 	c.includeSymbols = bool(i)
 }
@@ -31,11 +26,6 @@ func IncludePunctuation() includePunctuation {
 	return includePunctuation(true)
 }
 
-// IgnorePunctuation ignores punctuation in extraction. E.g. "a.nested_path" => []{"a", "nested", "path"}
-func IgnorePunctuation() includePunctuation {
-	return includePunctuation(false)
-}
-
 func (i includePunctuation) apply(c *config) {
 	c.includePunctuation = bool(i)
 }
@@ -46,11 +36,6 @@ type includeSpaces bool
 // IncludeSpaces includes spaces in the extraction. E.g. "the  moon" => []{"the", "  ", "moon"}
 func IncludeSpaces() includeSpaces {
 	return includeSpaces(true)
-}
-
-// Ignore spaces includes spaces in the extraction. E.g. "the  moon" => []{"the", "moon"}
-func IgnoreSpaces() includeSpaces {
-	return includeSpaces(false)
 }
 
 func (i includeSpaces) apply(c *config) {

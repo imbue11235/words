@@ -5,9 +5,9 @@ import (
 	"testing"
 )
 
-func benchmarkExtract(input string, b *testing.B) {
+func benchmarkExtract(input string, b *testing.B, options ...words.Option) {
 	for i := 0; i < b.N; i++ {
-		words.Extract(input)
+		words.Extract(input, options...)
 	}
 }
 
@@ -21,4 +21,8 @@ func BenchmarkExtract2RuneTypes(b *testing.B) {
 
 func BenchmarkExtract3RuneTypes(b *testing.B) {
 	benchmarkExtract("Apple Iphone 12 Pro Max", b)
+}
+
+func BenchmarkAllowHyphenatedWords(b *testing.B) {
+	benchmarkExtract("Family-sized caravan 12", b, words.AllowHyphenatedWords())
 }

@@ -74,6 +74,21 @@ func in(runeKind int, runeKinds []int) bool {
 	return false
 }
 
+func isHyphenatedWord(r rune, lastRuneKind, nextRuneKind int) bool {
+	if r != hyphen {
+		return false
+	}
+
+	// Make sure that the runes kind are equal
+	// to avoid false hyphenated words.
+	// E.g. "SOME-word", should still be []{"SOME", "word"}
+	if lastRuneKind != nextRuneKind {
+		return false
+	}
+
+	return in(lastRuneKind, []int{lowercase, uppercase}) && in(nextRuneKind, []int{lowercase, uppercase})
+}
+
 // extract with by the defined rules
 func extract(input string, config *config) []string {
 	// Early return, if invalid string (Rule 1)
@@ -84,19 +99,22 @@ func extract(input string, config *config) []string {
 	var runes [][]rune
 	runeKind, lastRuneKind, runesLen := 0, 0, -1
 
-	for _, r := range input {
+	for i, r := range input {
 		// If hyphenated words are allowed and current character is hyphenated,
 		// it'll get appended to the current rune slice,
-		// if the previous rune was a letter (upper/lowercase)
+		// if the adjacent runes of a hyphen is a letter of same kind (upper/lowercase),
 		// without keeping track of it's rune type (Rule 2).
-		// However, if the hyphen is the first character of a word, it will be skipped.
-		if config.allowHyphenatedWords &&
-			r == hyphen &&
-			in(lastRuneKind, []int{lowercase, uppercase}) &&
-			runesLen >= 0 &&
-			len(runes[runesLen]) != 0 {
-			runes[runesLen] = append(runes[runesLen], r)
-			continue
+		if config.allowHyphenatedWords {
+			var nextRuneKind int
+
+			if len(input) > i+1 {
+				nextRuneKind = getRuneKind(rune(input[i+1]))
+			}
+
+			if isHyphenatedWord(r, lastRuneKind, nextRuneKind) {
+				runes[runesLen] = append(runes[runesLen], r)
+				continue
+			}
 		}
 
 		// Define the rune kind
