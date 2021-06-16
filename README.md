@@ -1,4 +1,4 @@
-# Words [![Test Status](https://github.com/imbue11235/words/workflows/Go/badge.svg)](https://github.com/imbue11235/words/actions?query=workflow:Go) [![codecov](https://codecov.io/gh/imbue11235/words/branch/main/graph/badge.svg?token=XTJ42655U1)](https://codecov.io/gh/imbue11235/words)
+# Words [![Test Status](https://github.com/imbue11235/words/workflows/Go/badge.svg)](https://github.com/imbue11235/words/actions?query=workflow:Go) [![codecov](https://codecov.io/gh/imbue11235/words/branch/main/graph/badge.svg?token=XTJ42655U1)](https://codecov.io/gh/imbue11235/words) [![Go Reference](https://pkg.go.dev/badge/github.com/imbue11235/words.svg)](https://pkg.go.dev/github.com/imbue11235/words)
 Go package `words` provides capabilities for extracting words from a string, by a collection of rules.
 
 ## Rules
