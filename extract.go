@@ -1,6 +1,12 @@
 // Package words provides capabilities for splitting
 // a string into a slice of words by a collection of rules
-//
+package words
+
+import (
+	"unicode"
+	"unicode/utf8"
+)
+
 // Rules:
 // 1. Invalid UTF8-strings will not be split
 // 2. Hyphenated words will be treated as individual words unless disabled. E.g. "small-town" => []{"small", "town"}
@@ -9,12 +15,6 @@
 // 4. Characters of same type in sequence, will be put together.
 // 5. If the current character is a lowercase, and the last character of the previous word was uppercase,
 // the uppercase letter will be moved to the lowercase string. E.g. "YAMLParser" => []{"YAML", "Parser"}
-package words
-
-import (
-	"unicode"
-	"unicode/utf8"
-)
 
 const (
 	symbol = 1 + iota
