@@ -1,4 +1,4 @@
-# Words [![Test Status](https://github.com/imbue11235/words/workflows/Go/badge.svg)](https://github.com/imbue11235/words/actions?query=workflow%3A%Go%22) [![codecov](https://codecov.io/gh/imbue11235/words/branch/main/graph/badge.svg?token=XTJ42655U1)](https://codecov.io/gh/imbue11235/words)
+# Words [![Test Status](https://github.com/imbue11235/words/workflows/Go/badge.svg)](https://github.com/imbue11235/words/actions?query=workflow:Go) [![codecov](https://codecov.io/gh/imbue11235/words/branch/main/graph/badge.svg?token=XTJ42655U1)](https://codecov.io/gh/imbue11235/words)
 Go package `words` provides capabilities for extracting words from a string, by a collection of rules.
 
 ## Rules
@@ -78,3 +78,7 @@ To use multiple options at the same time
 words.Extract("Using multiple options!" words.IncludeSpaces(), words.IncludePunctuation())
 // => []string{"Using", " ", "multiple", " ", "options", "!"}
 ```
+
+## License
+
+This project is licensed under the [MIT license](LICENSE).
