@@ -3,6 +3,7 @@
 package words
 
 import (
+	"golang.org/x/exp/slices"
 	"unicode"
 	"unicode/utf8"
 )
@@ -64,17 +65,6 @@ func shouldInclude(runeKind int, config *config) bool {
 	return true
 }
 
-// in checks if the rune kind is in the given slice of rune kinds
-func in(runeKind int, runeKinds []int) bool {
-	for _, kind := range runeKinds {
-		if runeKind == kind {
-			return true
-		}
-	}
-
-	return false
-}
-
 // isHyphenatedWord determines if the word is a hyphenated word
 // by looking at adjacent rune kinds
 func isHyphenatedWord(r rune, lastRuneKind, nextRuneKind int) bool {
@@ -89,7 +79,7 @@ func isHyphenatedWord(r rune, lastRuneKind, nextRuneKind int) bool {
 		return false
 	}
 
-	return in(lastRuneKind, []int{lowercase, uppercase}) && in(nextRuneKind, []int{lowercase, uppercase})
+	return slices.Contains([]int{lowercase, uppercase}, lastRuneKind) && slices.Contains([]int{lowercase, uppercase}, nextRuneKind)
 }
 
 // extract with by the defined rules
@@ -103,6 +93,14 @@ func extract(input string, config *config) []string {
 	runeKind, lastRuneKind, runesLen := 0, 0, -1
 
 	for i, r := range input {
+		// If the rune should be ignored, we will simply add it to
+		// the current word, and treat it of same rune kind as the last
+		// added value
+		if slices.Contains(config.ignoredRunes, r) {
+			runes[runesLen] = append(runes[runesLen], r)
+			continue
+		}
+
 		// If hyphenated words are allowed and current character is hyphenated,
 		// it'll get appended to the current rune slice,
 		// if the adjacent runes of a hyphen is a letter of same kind (upper/lowercase),
@@ -144,7 +142,7 @@ func extract(input string, config *config) []string {
 		// Keep track of the runes index, instead of using len(runes) to find current index
 		runesLen++
 
-		// Move a uppercase rune from the end of previous word, to this word (Rule 5).
+		// Move an uppercase rune from the end of previous word, to this word (Rule 5).
 		if lastRuneKind == uppercase && runeKind == lowercase {
 			// Prepend the last character of previous rune-slice
 			runes[runesLen] = append([]rune{runes[runesLen-1][len(runes[runesLen-1])-1]}, runes[runesLen]...)
@@ -153,7 +151,6 @@ func extract(input string, config *config) []string {
 		}
 
 		lastRuneKind = runeKind
-
 	}
 
 	// Convert the rune slices to strings
@@ -171,8 +168,8 @@ func extract(input string, config *config) []string {
 
 // Extract extracts words from a given string with potential options.
 func Extract(input string, options ...Option) []string {
-	config := newDefaultConfig()
-	config.apply(options...)
+	cfg := newDefaultConfig()
+	cfg.apply(options...)
 
-	return extract(input, config)
+	return extract(input, cfg)
 }

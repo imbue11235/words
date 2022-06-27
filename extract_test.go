@@ -7,7 +7,7 @@ import (
 )
 
 type testSet struct {
-	input string
+	input    string
 	expected []string
 }
 
@@ -34,7 +34,7 @@ func TestExtract(t *testing.T) {
 		{"aeiouAreVowels", []string{"aeiou", "Are", "Vowels"}},
 		{"XmlHTTP", []string{"Xml", "HTTP"}},
 		{"isISO8601", []string{"is", "ISO", "8601"}},
-		{"Win2000", []string{"Win", "2000"} },
+		{"Win2000", []string{"Win", "2000"}},
 		{"Bose QC35", []string{"Bose", "QC", "35"}},
 		{"YAMLParser", []string{"YAML", "Parser"}},
 		{"SOME_CONSTANT_STRING_REPRESENTATION", []string{"SOME", "CONSTANT", "STRING", "REPRESENTATION"}},
@@ -93,4 +93,14 @@ func TestExtractWithOptionIncludePunctuation(t *testing.T) {
 	}
 
 	runExtractTest(t, tests, words.IncludePunctuation())
+}
+
+func TestExtractWithIgnoredRunes(t *testing.T) {
+	tests := []testSet{
+		{"ignored.runes", []string{"ignored.runes"}},
+		{"etc. and so on", []string{"etc.", "and", "so", "on"}},
+		{"etc! and so on", []string{"etc", "and", "so", "on"}},
+	}
+
+	runExtractTest(t, tests, words.WithIgnoredRunes('.'))
 }

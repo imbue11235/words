@@ -2,55 +2,43 @@ package words
 
 // Option defines the interface for
 // applying options to the extraction
-type Option interface {
-	apply(c *config)
-}
-
-// Include symbols option
-type includeSymbols bool
+type Option func(c *config)
 
 // IncludeSymbols includes symbols in the extraction. E.g. "beer>food" => []{"beer", ">", "food"}
-func IncludeSymbols() includeSymbols {
-	return includeSymbols(true)
+func IncludeSymbols() Option {
+	return func(c *config) {
+		c.includeSymbols = true
+	}
 }
-
-func (i includeSymbols) apply(c *config) {
-	c.includeSymbols = bool(i)
-}
-
-// Include punctuation option
-type includePunctuation bool
 
 // IncludePunctuation includes punctuation in extraction. E.g. "a.nested_path" => []{"a", ".", "nested", "-", "path"}
-func IncludePunctuation() includePunctuation {
-	return includePunctuation(true)
+func IncludePunctuation() Option {
+	return func(c *config) {
+		c.includePunctuation = true
+	}
 }
-
-func (i includePunctuation) apply(c *config) {
-	c.includePunctuation = bool(i)
-}
-
-// Include spaces option
-type includeSpaces bool
 
 // IncludeSpaces includes spaces in the extraction. E.g. "the  moon" => []{"the", "  ", "moon"}
-func IncludeSpaces() includeSpaces {
-	return includeSpaces(true)
+func IncludeSpaces() Option {
+	return func(c *config) {
+		c.includeSpaces = true
+	}
 }
 
-func (i includeSpaces) apply(c *config) {
-	c.includeSpaces = bool(i)
-}
-
-// Allow hyphenated words option
-type allowHyphenatedWords bool
-
-// Allow hyphenated words allows hyphenated words in the extraction.
+// AllowHyphenatedWords allows hyphenated words in the extraction.
 // E.g. "a family-sized pizza" => []{"a", "family-sized", "pizza"}
-func AllowHyphenatedWords() allowHyphenatedWords {
-	return allowHyphenatedWords(true)
+func AllowHyphenatedWords() Option {
+	return func(c *config) {
+		c.allowHyphenatedWords = true
+	}
 }
 
-func (a allowHyphenatedWords) apply(c *config) {
-	c.allowHyphenatedWords = true
+// WithIgnoredRunes tells the extractor to ignore these runes
+// when they are encountered, simply adding them to the output
+// as the rune was of most recent rune kind.
+// E.g. => WithIgnoredRunes('.') "Etc. and so on" becomes => []{"Etc.", "and", "so", "on"}
+func WithIgnoredRunes(runes ...rune) Option {
+	return func(c *config) {
+		c.ignoredRunes = append(c.ignoredRunes, runes...)
+	}
 }
