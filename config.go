@@ -6,6 +6,7 @@ type config struct {
 	includeSpaces        bool
 	allowHyphenatedWords bool
 	ignoredRunes         []rune
+	ignoredRunesKinds    []RuneKind
 }
 
 // newDefaultConfig defines the standards
@@ -17,6 +18,7 @@ func newDefaultConfig() *config {
 		includeSpaces:        false,
 		allowHyphenatedWords: false,
 		ignoredRunes:         make([]rune, 0),
+		ignoredRunesKinds:    make([]RuneKind, 0),
 	}
 }
 

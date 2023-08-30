@@ -100,7 +100,20 @@ func TestExtractWithIgnoredRunes(t *testing.T) {
 		{"ignored.runes", []string{"ignored.runes"}},
 		{"etc. and so on", []string{"etc.", "and", "so", "on"}},
 		{"etc! and so on", []string{"etc", "and", "so", "on"}},
+		{".start_and_end_with_periods.", []string{".start", "and", "end", "with", "periods."}},
 	}
 
 	runExtractTest(t, tests, words.WithIgnoredRunes('.'))
+}
+
+func TestExtractWithIgnoreNumbers(t *testing.T) {
+	tests := []testSet{
+		{"100cm", []string{"100cm"}},
+		{"QC35", []string{"QC35"}},
+		{"Win2000", []string{"Win2000"}},
+		{"100cm QC35 Win2000", []string{"100cm", "QC35", "Win2000"}},
+		{"100cmQC35Win2000", []string{"100cm", "QC35", "Win2000"}},
+	}
+
+	runExtractTest(t, tests, words.WithIgnoredRuneKinds(words.Digit))
 }
