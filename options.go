@@ -42,3 +42,12 @@ func WithIgnoredRunes(runes ...rune) Option {
 		c.ignoredRunes = append(c.ignoredRunes, runes...)
 	}
 }
+
+// WithIgnoredRuneKinds tells the extractor to ignore these rune kinds
+// when they are encountered, simply adding them to the output
+// as the rune was of most recent rune kind.
+func WithIgnoredRuneKinds(runeKinds ...RuneKind) Option {
+	return func(c *config) {
+		c.ignoredRunesKinds = append(c.ignoredRunesKinds, runeKinds...)
+	}
+}

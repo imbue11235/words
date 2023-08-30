@@ -17,48 +17,50 @@ import (
 // 5. If the current character is a lowercase, and the last character of the previous word was uppercase,
 // the uppercase letter will be moved to the lowercase string. E.g. "YAMLParser" => []{"YAML", "Parser"}
 
+type RuneKind int
+
 const (
-	symbol = 1 + iota
-	uppercase
-	lowercase
-	space
-	digit
-	punctuation
-	unknown
+	Symbol RuneKind = 1 + iota
+	Uppercase
+	Lowercase
+	Space
+	Digit
+	Punctuation
+	Unknown
 )
 
 const hyphen = rune(45)
 
 // getRuneKind takes the rune and returns
 // the int representation of it's kind
-func getRuneKind(r rune) int {
+func getRuneKind(r rune) RuneKind {
 	switch {
 	case unicode.IsSymbol(r):
-		return symbol
+		return Symbol
 	case unicode.IsUpper(r):
-		return uppercase
+		return Uppercase
 	case unicode.IsLower(r):
-		return lowercase
+		return Lowercase
 	case unicode.IsSpace(r):
-		return space
+		return Space
 	case unicode.IsDigit(r):
-		return digit
+		return Digit
 	case unicode.IsPunct(r):
-		return punctuation
+		return Punctuation
 	}
 
-	return unknown
+	return Unknown
 }
 
 // shouldInclude checks if the kind of rune should be included
 // in the word
-func shouldInclude(runeKind int, config *config) bool {
+func shouldInclude(runeKind RuneKind, config *config) bool {
 	switch runeKind {
-	case symbol:
+	case Symbol:
 		return config.includeSymbols
-	case punctuation:
+	case Punctuation:
 		return config.includePunctuation
-	case space:
+	case Space:
 		return config.includeSpaces
 	}
 
@@ -67,7 +69,7 @@ func shouldInclude(runeKind int, config *config) bool {
 
 // isHyphenatedWord determines if the word is a hyphenated word
 // by looking at adjacent rune kinds
-func isHyphenatedWord(r rune, lastRuneKind, nextRuneKind int) bool {
+func isHyphenatedWord(r rune, lastRuneKind, nextRuneKind RuneKind) bool {
 	if r != hyphen {
 		return false
 	}
@@ -79,7 +81,16 @@ func isHyphenatedWord(r rune, lastRuneKind, nextRuneKind int) bool {
 		return false
 	}
 
-	return slices.Contains([]int{lowercase, uppercase}, lastRuneKind) && slices.Contains([]int{lowercase, uppercase}, nextRuneKind)
+	return slices.Contains([]RuneKind{Lowercase, Uppercase}, lastRuneKind) && slices.Contains([]RuneKind{Lowercase, Uppercase}, nextRuneKind)
+}
+
+// max returns the largest of two integers
+func max(a, b int) int {
+	if a > b {
+		return a
+	}
+
+	return b
 }
 
 // extract with by the defined rules
@@ -90,14 +101,29 @@ func extract(input string, config *config) []string {
 	}
 
 	var runes [][]rune
-	runeKind, lastRuneKind, runesLen := 0, 0, -1
+	var runeKind, lastRuneKind RuneKind
+	runesLen := -1
 
 	for i, r := range input {
 		// If the rune should be ignored, we will simply add it to
 		// the current word, and treat it of same rune kind as the last
 		// added value
-		if slices.Contains(config.ignoredRunes, r) {
+		if slices.Contains(config.ignoredRunes, r) || slices.Contains(config.ignoredRunesKinds, getRuneKind(r)) {
+			// If the current rune is the first rune, we will append a new slice
+			if runesLen == -1 {
+				runes = append(runes, []rune{})
+				runesLen++
+			}
+
 			runes[runesLen] = append(runes[runesLen], r)
+
+			// If there is a next rune, we will set the last rune kind to the next rune kind
+			// to indicate that the next rune should be treated as the same kind as the last,
+			// even if it's not.
+			if len(input) > i+1 {
+				lastRuneKind = getRuneKind(rune(input[i+1]))
+			}
+
 			continue
 		}
 
@@ -106,7 +132,7 @@ func extract(input string, config *config) []string {
 		// if the adjacent runes of a hyphen is a letter of same kind (upper/lowercase),
 		// without keeping track of it's rune type (Rule 2).
 		if config.allowHyphenatedWords {
-			var nextRuneKind int
+			var nextRuneKind RuneKind
 
 			if len(input) > i+1 {
 				nextRuneKind = getRuneKind(rune(input[i+1]))
@@ -143,7 +169,7 @@ func extract(input string, config *config) []string {
 		runesLen++
 
 		// Move an uppercase rune from the end of previous word, to this word (Rule 5).
-		if lastRuneKind == uppercase && runeKind == lowercase {
+		if lastRuneKind == Uppercase && runeKind == Lowercase {
 			// Prepend the last character of previous rune-slice
 			runes[runesLen] = append([]rune{runes[runesLen-1][len(runes[runesLen-1])-1]}, runes[runesLen]...)
 			// Remove the last character from the previous rune-slice
