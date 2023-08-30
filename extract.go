@@ -84,15 +84,6 @@ func isHyphenatedWord(r rune, lastRuneKind, nextRuneKind RuneKind) bool {
 	return slices.Contains([]RuneKind{Lowercase, Uppercase}, lastRuneKind) && slices.Contains([]RuneKind{Lowercase, Uppercase}, nextRuneKind)
 }
 
-// max returns the largest of two integers
-func max(a, b int) int {
-	if a > b {
-		return a
-	}
-
-	return b
-}
-
 // extract with by the defined rules
 func extract(input string, config *config) []string {
 	// Early return, if invalid string (Rule 1)
